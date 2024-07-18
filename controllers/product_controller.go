@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -42,9 +43,9 @@ func GetAllProducts(ctx *gin.Context) {
 
 func GetOneProduct(ctx *gin.Context) {
 
-	id:= ctx.Param("id")
+	id := ctx.Param("id")
 
-    products, err := services.FindOne(id)
+	products, err := services.FindOne(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Getting One products"})
 		return
@@ -54,6 +55,25 @@ func GetOneProduct(ctx *gin.Context) {
 }
 
 func UpdateProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var product models.Product
+	err := ctx.ShouldBindJSON(&product)
+	if err != nil {
+		log.Printf("Error parsing product %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
+		return
+	}
+
+	result, err := services.Update(id, &product)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error updated products"})
+		return
+	}
+
+	fmt.Println(result)
+
+	ctx.JSON(http.StatusCreated, gin.H{"message": "Product updated successfully"})
 
 }
 

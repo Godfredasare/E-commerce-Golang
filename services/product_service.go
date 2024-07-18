@@ -58,6 +58,8 @@ func FindAll() ([]models.Product, error) {
 			return nil, err
 		}
 
+		defer cur.Close(context.Background())
+
 		products = append(products, product)
 
 	}
@@ -82,5 +84,32 @@ func FindOne(productID string) (*models.Product, error) {
 	}
 
 	return &product, nil
+
+}
+
+func Update(productID string, p *models.Product) (int64, error) {
+	col := database.Collection(name)
+
+	id, _ := primitive.ObjectIDFromHex(productID)
+
+	filter := bson.D{{Key: "_id", Value: id}}
+
+
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "name", Value: p.Name},
+		{Key: "description", Value: p.Description},
+		{Key: "price", Value: p.Price},
+		{Key: "currency", Value: p.Currency},
+		{Key: "stock", Value: p.Stock},
+		{Key: "updated_at", Value: time.Now().Format(time.RFC3339)},
+	}}}
+
+	result, err := col.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Printf("Error updating product %v", err)
+		return 0, err
+	}
+
+	return result.ModifiedCount, nil
 
 }
