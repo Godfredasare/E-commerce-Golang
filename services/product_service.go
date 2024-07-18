@@ -14,13 +14,13 @@ import (
 
 var name = "products"
 
-func setDefault(p models.Product) {
+func setDefault(p *models.Product) {
 	if p.Currency == "" {
 		p.Currency = "USD"
 	}
 }
 
-func CreateProduct(p models.Product) error {
+func CreateProduct(p *models.Product) error {
 	col := database.Collection(name)
 
 	setDefault(p)
@@ -93,6 +93,8 @@ func Update(productID string, p *models.Product) (int64, error) {
 	id, _ := primitive.ObjectIDFromHex(productID)
 
 	filter := bson.D{{Key: "_id", Value: id}}
+
+	setDefault(p)
 
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: p.Name},

@@ -20,7 +20,7 @@ func PostProduct(ctx *gin.Context) {
 		return
 	}
 
-	err = services.CreateProduct(product)
+	err = services.CreateProduct(&product)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
 		return
