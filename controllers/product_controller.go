@@ -25,15 +25,32 @@ func PostProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusBadRequest, gin.H{"message": "Product inserted successfully"})
+	ctx.JSON(http.StatusCreated, gin.H{"message": "Product inserted successfully"})
 }
 
 func GetAllProducts(ctx *gin.Context) {
+
+	products, err := services.FindAll()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Getting all products"})
+		return
+	}
+
+	ctx.JSON(http.StatusFound, products)
 
 }
 
 func GetOneProduct(ctx *gin.Context) {
 
+	id:= ctx.Param("id")
+
+    products, err := services.FindOne(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Getting One products"})
+		return
+	}
+
+	ctx.JSON(http.StatusFound, products)
 }
 
 func UpdateProduct(ctx *gin.Context) {
