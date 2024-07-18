@@ -94,7 +94,6 @@ func Update(productID string, p *models.Product) (int64, error) {
 
 	filter := bson.D{{Key: "_id", Value: id}}
 
-
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: p.Name},
 		{Key: "description", Value: p.Description},
@@ -112,4 +111,20 @@ func Update(productID string, p *models.Product) (int64, error) {
 
 	return result.ModifiedCount, nil
 
+}
+
+func Delete(productID string) (int64, error) {
+	col := database.Collection(name)
+
+	id, _ := primitive.ObjectIDFromHex(productID)
+
+	filter := bson.D{{Key: "_id", Value: id}}
+	result, err := col.DeleteOne(context.Background(), filter)
+
+	if err != nil {
+		log.Printf("Error updating product %v", err)
+		return 0, err
+	}
+
+	return result.DeletedCount, nil
 }

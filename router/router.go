@@ -10,6 +10,6 @@ func Router(server *gin.Engine) {
 	server.GET("/api/product/:id", controllers.GetOneProduct)
 	server.POST("/api/product", controllers.PostProduct)
 	server.PUT("/api/product/:id", controllers.UpdateProduct)
-	// server.GET("/api/product", controllers.DeleteProduct)
+	server.DELETE("/api/product/:id", controllers.DeleteProduct)
 
 }

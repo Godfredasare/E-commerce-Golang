@@ -73,10 +73,20 @@ func UpdateProduct(ctx *gin.Context) {
 
 	fmt.Println(result)
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Product updated successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
 
 }
 
 func DeleteProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+	result, err := services.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Deteting products"})
+		return
+	}
+
+	fmt.Println(result)
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 
 }
