@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -71,7 +70,10 @@ func UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(result)
+	if result <= 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "Product/ID do not exist"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
 
@@ -85,7 +87,10 @@ func DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(result)
+	if result <= 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "Product/ID do not exist"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 
