@@ -9,8 +9,8 @@ type Product struct {
 	Name        string             `json:"name" bson:"name" validate:"required"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
 	Price       float64            `json:"price" bson:"price" validate:"required"`
-	Currency    string             `json:"currency" bson:"currency" validate:"required"`
-	Stock       int64              `json:"stock" bson:"stock"`
+	Currency    string             `json:"currency" bson:"currency"`
+	Stock       int64              `json:"stock" bson:"stock"  validate:"required"`
 	// Images      []string           `json:"images" validate:"required"`
 	// User_id     primitive.ObjectID `json:"user_id" bson:"user_id" validate:"required"`
 	CreatedAt string `json:"created_at" bson:"created_at"`

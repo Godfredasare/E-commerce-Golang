@@ -6,6 +6,7 @@ import (
 
 	"github.com/Godfredasare/go-ecommerce/models"
 	"github.com/Godfredasare/go-ecommerce/services"
+	"github.com/Godfredasare/go-ecommerce/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,12 @@ func PostProduct(ctx *gin.Context) {
 	if err != nil {
 		log.Printf("Error parsing product %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
+		return
+	}
+
+	errMessage := utils.Validation(&product)
+	if len(errMessage) > 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Validation failed", "errors": errMessage})
 		return
 	}
 
@@ -61,6 +68,12 @@ func UpdateProduct(ctx *gin.Context) {
 	if err != nil {
 		log.Printf("Error parsing product %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
+		return
+	}
+
+	errMessage := utils.Validation(&product)
+	if len(errMessage) > 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Validation failed", "errors": errMessage})
 		return
 	}
 

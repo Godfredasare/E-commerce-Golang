@@ -4,6 +4,7 @@ import (
 	"github.com/Godfredasare/go-ecommerce/config"
 	"github.com/Godfredasare/go-ecommerce/database"
 	"github.com/Godfredasare/go-ecommerce/router"
+	"github.com/Godfredasare/go-ecommerce/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +14,8 @@ func main() {
 	database.InitDB()
 
 	defer database.CloseDB()
+
+	utils.InitializeValidatorUniversalTranslator()
 
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
