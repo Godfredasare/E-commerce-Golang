@@ -33,3 +33,14 @@ func InsertUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"message": "User created successully"})
 
 }
+
+func GetAllUsers(ctx *gin.Context)  {
+	 users, err:= services.FindAllUsers()
+	 if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error getting users"})
+		return
+	}
+
+	ctx.JSON(http.StatusFound, users)
+
+}

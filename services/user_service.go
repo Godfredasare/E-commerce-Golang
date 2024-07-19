@@ -7,6 +7,7 @@ import (
 
 	"github.com/Godfredasare/go-ecommerce/database"
 	"github.com/Godfredasare/go-ecommerce/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -18,16 +19,41 @@ func CreateUser(u *models.Users) error {
 	col := database.Collection(userDB)
 
 	u.ID = primitive.NewObjectID()
-	u.CreatedAt= u.ID.Timestamp().String()
-	u.UpdatedAt= u.ID.Timestamp().String()
+	u.CreatedAt = u.ID.Timestamp().String()
+	u.UpdatedAt = u.ID.Timestamp().String()
 
 	result, err := col.InsertOne(context.Background(), u)
 	if err != nil {
 		log.Fatalf("Error inserting to users %v", err)
+		return err
 	}
 
 	fmt.Println(result.InsertedID)
 
 	return nil
 
+}
+
+func FindAllUsers() ([]models.Users, error) {
+	col := database.Collection(userDB)
+	cur, err := col.Find(context.Background(), bson.M{})
+	if err != nil {
+		log.Fatalf("Error getting all to users %v", err)
+		return nil, err
+	}
+
+	var users []models.Users
+	for cur.Next(context.Background()) {
+		var user models.Users
+		err := cur.Decode(&user)
+		if err != nil {
+			log.Fatalf("Error %v", err)
+			return nil, err
+		}
+
+		users = append(users, user)
+
+	}
+
+	return users, nil
 }

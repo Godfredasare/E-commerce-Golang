@@ -14,5 +14,5 @@ func Router(server *gin.Engine) {
 	server.DELETE("/api/product/:id", controllers.DeleteProduct)
 
 	server.POST("/api/user", controllers.InsertUser)
-
+	server.GET("/api/user", controllers.GetAllUsers)
 }
