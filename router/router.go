@@ -15,4 +15,6 @@ func Router(server *gin.Engine) {
 
 	server.POST("/api/user", controllers.InsertUser)
 	server.GET("/api/user", controllers.GetAllUsers)
+	server.PUT("/api/user/:id", controllers.UpdateUser)
+
 }

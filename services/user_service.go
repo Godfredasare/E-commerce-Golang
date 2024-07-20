@@ -57,3 +57,25 @@ func FindAllUsers() ([]models.Users, error) {
 
 	return users, nil
 }
+
+func UpdateUser(userId string, u *models.Users) (int64, error) {
+	col := database.Collection(userDB)
+	id, _ := primitive.ObjectIDFromHex(userId)
+
+	filter := bson.D{{Key: "_id", Value: id}}
+
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "username", Value: u.Username},
+		{Key: "email", Value: u.Email},
+		{Key: "password", Value: u.Password},
+		{Key: "updated_at", Value: u.ID.Timestamp().String()},
+	}}}
+
+	result, err := col.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Fatalf("Error updating user %v", err)
+		return 0, err
+	}
+
+	return result.ModifiedCount, nil
+}
