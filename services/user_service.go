@@ -7,6 +7,7 @@ import (
 
 	"github.com/Godfredasare/go-ecommerce/database"
 	"github.com/Godfredasare/go-ecommerce/models"
+	"github.com/Godfredasare/go-ecommerce/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -21,6 +22,14 @@ func CreateUser(u *models.Users) error {
 	u.ID = primitive.NewObjectID()
 	u.CreatedAt = u.ID.Timestamp().String()
 	u.UpdatedAt = u.ID.Timestamp().String()
+
+	hassPassword, err := utils.HashPassword(u.Password)
+	if err != nil {
+		log.Printf("Error %v", err)
+		return err
+	}
+
+	u.Password = hassPassword
 
 	result, err := col.InsertOne(context.Background(), u)
 	if err != nil {
