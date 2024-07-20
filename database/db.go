@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -39,7 +40,7 @@ func InitDB() {
 	}
 
 	fmt.Println("DB connected sucsessfully")
-
+	createUniqueIndex()
 }
 
 func CloseDB() {
@@ -47,4 +48,19 @@ func CloseDB() {
 	if err != nil {
 		log.Fatalf("Failed to disconnect from MongoDB: %v", err)
 	}
+}
+
+func createUniqueIndex() {
+	col := Collection("users")
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{"email": 1}, // Create an index on the email field
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err := col.Indexes().CreateOne(context.Background(), indexModel)
+	if err != nil {
+		log.Fatalf("Could not create index: %v", err)
+	}
+
+	fmt.Println("Unique index on email field created successfully")
 }

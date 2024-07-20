@@ -24,7 +24,7 @@ func CreateUser(u *models.Users) error {
 
 	result, err := col.InsertOne(context.Background(), u)
 	if err != nil {
-		log.Fatalf("Error inserting to users %v", err)
+		log.Printf("Error inserting to users %v", err)
 		return err
 	}
 
@@ -38,7 +38,7 @@ func FindAllUsers() ([]models.Users, error) {
 	col := database.Collection(userDB)
 	cur, err := col.Find(context.Background(), bson.M{})
 	if err != nil {
-		log.Fatalf("Error getting all to users %v", err)
+		log.Printf("Error getting all to users %v", err)
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func FindAllUsers() ([]models.Users, error) {
 		var user models.Users
 		err := cur.Decode(&user)
 		if err != nil {
-			log.Fatalf("Error %v", err)
+			log.Printf("Error %v", err)
 			return nil, err
 		}
 
@@ -73,7 +73,7 @@ func UpdateUser(userId string, u *models.Users) (int64, error) {
 
 	result, err := col.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		log.Fatalf("Error updating user %v", err)
+		log.Printf("Error updating user %v", err)
 		return 0, err
 	}
 
