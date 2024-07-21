@@ -25,7 +25,7 @@ func LoginUser(ctx *gin.Context) {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email/password"})
 			return
 		}
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Internal server error"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
