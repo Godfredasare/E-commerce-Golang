@@ -28,7 +28,7 @@ func LoginUser(ctx *gin.Context) {
 		}
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
-	}
+	} 
 
 	token, err := utils.CreateToken(user.ID.Hex(), user.Email)
 	if err != nil {
