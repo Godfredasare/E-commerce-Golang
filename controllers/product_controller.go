@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -27,7 +26,6 @@ func PostProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorize user"})
 		return
 	}
-	fmt.Println(userID)
 
 	primitiveUserID, _ := primitive.ObjectIDFromHex(userID)
 	product.UserId = primitiveUserID
@@ -75,28 +73,32 @@ func GetOneProduct(ctx *gin.Context) {
 func UpdateProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var product models.Product
-	err := ctx.ShouldBindJSON(&product)
+	var req models.Product
+
+	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		log.Printf("Error parsing product %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
 		return
 	}
 
-	errMessage := utils.Validation(&product)
+	errMessage := utils.Validation(&req)
 	if len(errMessage) > 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Validation failed", "errors": errMessage})
 		return
 	}
 
-	result, err := services.Update(id, &product)
+	product, err := services.Update(id, &req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error updated products"})
 		return
 	}
 
-	if result <= 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "Product/ID do not exist"})
+	userID := ctx.GetString("userId")
+	primitiveUserID, _ := primitive.ObjectIDFromHex(userID)
+
+	if product.UserId != primitiveUserID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorize user"})
 		return
 	}
 
