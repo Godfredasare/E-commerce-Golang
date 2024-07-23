@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/Godfredasare/go-ecommerce/services"
 	"github.com/Godfredasare/go-ecommerce/utils"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func PostProduct(ctx *gin.Context) {
@@ -19,6 +21,16 @@ func PostProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
 		return
 	}
+
+	userID := ctx.GetString("userId")
+	if userID == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorize user"})
+		return
+	}
+	fmt.Println(userID)
+
+	primitiveUserID, _ := primitive.ObjectIDFromHex(userID)
+	product.UserId = primitiveUserID
 
 	errMessage := utils.Validation(&product)
 	if len(errMessage) > 0 {
