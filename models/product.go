@@ -11,6 +11,7 @@ type Product struct {
 	Price       float64            `json:"price" bson:"price" validate:"required"`
 	Currency    string             `json:"currency" bson:"currency"`
 	Stock       int64              `json:"stock" bson:"stock"  validate:"required"`
+	Category    string             `json:"category" bson:"category"  validate:"required"`
 	// Images      []string           `json:"images" validate:"required"`
 	UserId    primitive.ObjectID `json:"user_id" bson:"user_id"`
 	CreatedAt string             `json:"created_at" bson:"created_at"`

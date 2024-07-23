@@ -103,6 +103,7 @@ func Update(productID string, p *models.Product) (int64, error) {
 		{Key: "price", Value: p.Price},
 		{Key: "currency", Value: p.Currency},
 		{Key: "stock", Value: p.Stock},
+		{Key: "category", Value: p.Category},
 		{Key: "updated_at", Value: time.Now().Format(time.RFC3339)},
 	}}}
 
@@ -140,7 +141,7 @@ func FindProductsByUser(userID string) (*[]models.Product, error) {
 	cur, err := col.Find(context.Background(), filter)
 	if err != nil {
 		log.Println(err)
-		return nil, errors.New("No data can be found in db by this user")
+		return nil, errors.New("no data can be found in db by this user")
 	}
 
 	var products []models.Product
@@ -150,7 +151,7 @@ func FindProductsByUser(userID string) (*[]models.Product, error) {
 		err := cur.Decode(&product)
 		if err != nil {
 			log.Println(err)
-			return nil, errors.New("Error decoding dat")
+			return nil, errors.New("error decoding dat")
 		}
 
 		products = append(products, product)
