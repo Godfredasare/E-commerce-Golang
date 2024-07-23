@@ -88,9 +88,10 @@ func UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	product, err := services.Update(id, &req)
+	//check if user_id in db matches with the user updating from the middleware
+	product, err := services.FindOne(id)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error updated products"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Product do not exist"})
 		return
 	}
 
@@ -102,12 +103,39 @@ func UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
+	//update product
+	result, err := services.Update(id, &req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error updated products"})
+		return
+	}
+
+	if result <= 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "Product/ID do not exist"})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
 
 }
 
 func DeleteProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
+
+	product, err := services.FindOne(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Product do not exist"})
+		return
+	}
+
+	userID := ctx.GetString("userId")
+	primitiveUserID, _ := primitive.ObjectIDFromHex(userID)
+
+	if product.UserId != primitiveUserID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorize user"})
+		return
+	}
+
 	result, err := services.Delete(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Deteting products"})

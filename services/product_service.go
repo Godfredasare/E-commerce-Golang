@@ -87,7 +87,7 @@ func FindOne(productID string) (*models.Product, error) {
 
 }
 
-func Update(productID string, p *models.Product) (*models.Product, error) {
+func Update(productID string, p *models.Product) (int64, error) {
 	col := database.Collection(name)
 
 	id, _ := primitive.ObjectIDFromHex(productID)
@@ -105,15 +105,13 @@ func Update(productID string, p *models.Product) (*models.Product, error) {
 		{Key: "updated_at", Value: time.Now().Format(time.RFC3339)},
 	}}}
 
-	var product *models.Product
-
-	err := col.FindOneAndUpdate(context.Background(), filter, update).Decode(&product)
+	result, err := col.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Printf("Error updating product %v", err)
-		return nil, err
+		return 0, err
 	}
 
-	return product, nil
+	return result.ModifiedCount, nil
 
 }
 
