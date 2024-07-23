@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -129,4 +130,31 @@ func Delete(productID string) (int64, error) {
 	}
 
 	return result.DeletedCount, nil
+}
+
+func FindProductsByUser(userID string) (*[]models.Product, error) {
+	id, _ := primitive.ObjectIDFromHex(userID)
+	col := database.Collection(name)
+
+	filter := bson.D{{Key: "user_id", Value: id}}
+	cur, err := col.Find(context.Background(), filter)
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("No data can be found in db by this user")
+	}
+
+	var products []models.Product
+
+	for cur.Next(context.Background()) {
+		var product models.Product
+		err := cur.Decode(&product)
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("Error decoding dat")
+		}
+
+		products = append(products, product)
+	}
+
+	return &products, nil
 }
