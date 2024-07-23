@@ -136,6 +136,7 @@ func DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
+	//Detele product
 	result, err := services.Delete(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error Deteting products"})
