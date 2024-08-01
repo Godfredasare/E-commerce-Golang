@@ -152,9 +152,19 @@ func DeleteProduct(ctx *gin.Context) {
 
 }
 
+func SearchProduct(ctx *gin.Context)  {
+	searchQuery := ctx.Query("search")
 
+	products, err := services.SearchProduct(searchQuery)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
 
-func GetProductByUserId(ctx *gin.Context)  {
+	ctx.JSON(http.StatusFound, products)
+}
+
+func GetProductByUserId(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	products, err := services.FindProductsByUser(id)

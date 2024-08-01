@@ -133,6 +133,33 @@ func Delete(productID string) (int64, error) {
 	return result.DeletedCount, nil
 }
 
+func SearchProduct(search string) (*[]models.Product, error) {
+	col := database.Collection(name)
+	filter := bson.D{{Key: "name", Value: bson.D{{Key: "$regex", Value: search}, {Key: "$options", Value: "i"}}}}
+
+	cur, err := col.Find(context.Background(), filter)
+	if err != nil {
+		log.Printf("Error getting product %v", err)
+		return nil, errors.New("can't find products")
+	}
+
+	var products []models.Product
+
+	for cur.Next(context.Background()) {
+		var product models.Product
+		err := cur.Decode(&product)
+		if err != nil {
+			log.Printf("Error %v", err)
+			return nil, errors.New("can't decode products")
+		}
+
+		defer cur.Close(context.Background())
+		products = append(products, product)
+	}
+
+	return &products, nil
+}
+
 func FindProductsByUser(userID string) (*[]models.Product, error) {
 	id, _ := primitive.ObjectIDFromHex(userID)
 	col := database.Collection(name)

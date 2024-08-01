@@ -18,6 +18,7 @@ func Router(server *gin.Engine) {
 	
 	server.GET("/api/product", controllers.GetAllProducts)
 	server.GET("/api/product/:id", controllers.GetOneProduct)
+	server.GET("/api/product/search", controllers.SearchProduct)
 	server.GET("/api/product/user/:id", controllers.GetProductByUserId)
 
 
