@@ -3,32 +3,25 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Godfredasare/go-ecommerce/models"
 	"github.com/Godfredasare/go-ecommerce/services"
 	"github.com/Godfredasare/go-ecommerce/utils"
 	"github.com/gin-gonic/gin"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func PostProduct(ctx *gin.Context) {
 	var product models.Product
 
-	err := ctx.ShouldBindJSON(&product)
-	if err != nil {
-		log.Printf("Error parsing product %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
-		return
-	}
-
-	userID := ctx.GetString("userId")
-	if userID == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorize user"})
-		return
-	}
-
-	primitiveUserID, _ := primitive.ObjectIDFromHex(userID)
-	product.UserId = primitiveUserID
+	product.Name = ctx.PostForm("name")
+	product.Description = ctx.PostForm("description")
+	product.Price, _ = strconv.ParseFloat((ctx.PostForm("price")), 64)
+	product.Currency = ctx.PostForm("currency")
+	product.Stock, _ = strconv.ParseInt((ctx.PostForm("stock")), 10, 64)
+	product.Category = ctx.PostForm("category")
 
 	errMessage := utils.Validation(&product)
 	if len(errMessage) > 0 {
@@ -36,9 +29,48 @@ func PostProduct(ctx *gin.Context) {
 		return
 	}
 
+	// Get user ID from context
+	userID := ctx.GetString("userId")
+	if userID == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Unauthorized user"})
+		return
+	}
+
+	// Convert userID to primitive.ObjectID
+	primitiveUserID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Printf("Error converting userID: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid user ID"})
+		return
+	}
+	product.UserId = primitiveUserID
+
+	// Handle file upload
+	file, err := ctx.FormFile("images")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Save file locally
+	err = ctx.SaveUploadedFile(file, "assets/uploads/"+file.Filename)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
+		return
+	}
+
+	// Upload to Cloudinary
+	imageID, _, err := utils.UploadToCloudinary(file)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	product.ImagesID = imageID
+
+	// Save product to database
 	err = services.CreateProduct(&product)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error inserting product"})
 		return
 	}
 
@@ -78,7 +110,7 @@ func UpdateProduct(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		log.Printf("Error parsing product %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Errhhor parsing"})
 		return
 	}
 
@@ -152,7 +184,7 @@ func DeleteProduct(ctx *gin.Context) {
 
 }
 
-func SearchProduct(ctx *gin.Context)  {
+func SearchProduct(ctx *gin.Context) {
 	searchQuery := ctx.Query("search")
 
 	products, err := services.SearchProduct(searchQuery)

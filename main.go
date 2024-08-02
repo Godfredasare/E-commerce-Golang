@@ -19,9 +19,8 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
-
+	server.MaxMultipartMemory = 8 << 20  //8mib
 	router.Router(server)
 
 	server.Run(":8080")
 }
-
