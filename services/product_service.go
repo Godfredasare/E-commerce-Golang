@@ -40,30 +40,38 @@ func CreateProduct(p *models.Product) error {
 	return nil
 }
 
-func FindAll() ([]models.Product, error) {
+func FindAll() ([]bson.M, error) {
 	col := database.Collection(name)
 
-	cur, err := col.Find(context.Background(), bson.D{})
+	cur, err := col.Find(context.Background(), bson.M{})
 	if err != nil {
 		log.Printf("Error Finding product %v", err)
 		return nil, err
 	}
 
-	var products []models.Product
+	var products []bson.M
 
 	for cur.Next(context.Background()) {
-		var product models.Product
+		var product bson.M
 		err := cur.Decode(&product)
 		if err != nil {
 			log.Printf("Error decoding product %v", err)
 			return nil, err
 		}
 
+
+
 		defer cur.Close(context.Background())
 
 		products = append(products, product)
 
 	}
+
+	// err = cur.All(context.Background(), &products)
+	// if err != nil {
+	// 			log.Printf("Error decoding product %v", err)
+	// 		return nil, err
+	// 		}
 
 	return products, nil
 

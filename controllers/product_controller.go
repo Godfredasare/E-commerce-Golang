@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -46,26 +47,38 @@ func PostProduct(ctx *gin.Context) {
 	product.UserId = primitiveUserID
 
 	// Handle file upload
-	file, err := ctx.FormFile("images")
+	form, err := ctx.MultipartForm()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	files := form.File["images"]
+
 	// Save file locally
-	err = ctx.SaveUploadedFile(file, "assets/uploads/"+file.Filename)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
-		return
+
+	var imagesID []string
+
+	for _, file := range files {
+
+		// Upload the file to specific dst.
+		err = ctx.SaveUploadedFile(file, "assets/uploads/"+file.Filename)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
+			return
+		}
+
+		imageID, _, err := utils.UploadToCloudinary(file)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		imagesID = append(imagesID, imageID)
+
 	}
 
-	// Upload to Cloudinary
-	imageID, _, err := utils.UploadToCloudinary(file)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	product.ImagesID = imageID
+	product.ImagesID = imagesID
 
 	// Save product to database
 	err = services.CreateProduct(&product)
@@ -85,6 +98,7 @@ func GetAllProducts(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(products)
 	ctx.JSON(http.StatusFound, products)
 
 }

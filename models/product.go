@@ -12,7 +12,7 @@ type Product struct {
 	Currency    string             `json:"currency" form:"currency" bson:"currency"`
 	Stock       int64              `json:"stock" form:"stock" bson:"stock"  validate:"required"`
 	Category    string             `json:"category" form:"category" bson:"category"  validate:"required"`
-	ImagesID    string             `json:"images_id" form:"images" bson:"images_id"`
+	ImagesID    []string           `json:"images_id" form:"images" bson:"images_id"`
 	UserId      primitive.ObjectID `json:"user_id" form:"user_id" bson:"user_id"`
 	CreatedAt   string             `json:"created_at" form:"created_at" bson:"created_at"`
 	UpdatedAt   string             `json:"updated_at" form:"updated_at" bson:"updated_at"`
