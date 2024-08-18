@@ -30,7 +30,10 @@ func UploadToCloudinary(file *multipart.FileHeader) (string, string, error) {
 		return "", "", errors.New("error with cloudinary url")
 	}
 
-	resp, err := cld.Upload.Upload(ctx, "assets/uploads/"+file.Filename, uploader.UploadParams{PublicID: "image" + "-" + file.Filename + "-" + GenerateUid()})
+	resp, err := cld.Upload.Upload(ctx, "assets/uploads/"+file.Filename, uploader.UploadParams{
+		Folder:   "products",
+		PublicID: "image" + "-" + file.Filename + "-" + GenerateUid(),
+	})
 	if err != nil {
 		fmt.Println(err)
 		return "", "", errors.New("can't upload images")
