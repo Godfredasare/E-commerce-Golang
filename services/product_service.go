@@ -59,8 +59,6 @@ func FindAll() ([]bson.M, error) {
 			return nil, err
 		}
 
-
-
 		defer cur.Close(context.Background())
 
 		products = append(products, product)
@@ -91,6 +89,7 @@ func FindOne(productID string) (*models.Product, error) {
 		log.Printf("Error finding one product %v", err)
 		return nil, err
 	}
+	
 
 	return &product, nil
 

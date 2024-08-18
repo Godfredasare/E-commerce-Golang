@@ -182,6 +182,15 @@ func DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
+	//delete images from cloudinary
+	for _, imageId := range product.ImagesID {
+		err := utils.DeleteFromCloudinary(imageId)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
 	//Detele product
 	result, err := services.Delete(id)
 	if err != nil {

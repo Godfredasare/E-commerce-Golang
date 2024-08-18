@@ -45,12 +45,14 @@ func DeleteFromCloudinary(imageId string) error {
 
 	cld, err := cloudinary.NewFromURL(cloudinary_url)
 	if err != nil {
+		fmt.Println(err)
 		return errors.New("error with cloudinary url")
 	}
 
 	resp, err := cld.Upload.Destroy(context.Background(), uploader.DestroyParams{PublicID: imageId})
 	if err != nil || resp.Result != "ok" {
-		return errors.New("error deleting deleting images from cloudinary")
+		fmt.Println(err)
+		return errors.New("could not deleting deleting images from cloudinary")
 	}
 
 	return nil
