@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -23,10 +24,23 @@ func CreateUser(u *models.Users) error {
 	u.CreatedAt = u.ID.Timestamp().String()
 	u.UpdatedAt = u.ID.Timestamp().String()
 
+	//email exist
+	filter := bson.D{{Key: "email", Value: u.Email}}
+	count, err := col.CountDocuments(context.Background(), filter)
+	if err != nil {
+		log.Printf("Error %v", err)
+		return errors.New("error with count document")
+	}
+
+	if count > 0 {
+		return errors.New("email already exists")
+	}
+
+
 	hassPassword, err := utils.HashPassword(u.Password)
 	if err != nil {
 		log.Printf("Error %v", err)
-		return err
+		return errors.New("Error hashing password")
 	}
 
 	u.Password = hassPassword
@@ -34,7 +48,7 @@ func CreateUser(u *models.Users) error {
 	result, err := col.InsertOne(context.Background(), u)
 	if err != nil {
 		log.Printf("Error inserting to users %v", err)
-		return err
+		return errors.New("can not insert user")
 	}
 
 	fmt.Println(result.InsertedID)

@@ -7,7 +7,6 @@ import (
 	"github.com/Godfredasare/go-ecommerce/services"
 	"github.com/Godfredasare/go-ecommerce/utils"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func InsertUser(ctx *gin.Context) {
@@ -27,11 +26,11 @@ func InsertUser(ctx *gin.Context) {
 
 	err = services.CreateUser(&user)
 	if err != nil {
-		if mongo.IsDuplicateKeyError(err) {
-			ctx.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
-			return
-		}
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error inserting user"})
+		// if mongo.IsDuplicateKeyError(err) {
+		// 	ctx.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
+		// 	return
+		// }
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
