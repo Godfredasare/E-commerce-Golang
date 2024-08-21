@@ -40,7 +40,7 @@ func CreateUser(u *models.Users) error {
 	hassPassword, err := utils.HashPassword(u.Password)
 	if err != nil {
 		log.Printf("Error %v", err)
-		return errors.New("Error hashing password")
+		return errors.New("error hashing password")
 	}
 
 	u.Password = hassPassword
